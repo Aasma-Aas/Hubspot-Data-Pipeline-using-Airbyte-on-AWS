@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>HubSpot App</title>
+</head>
+<body>
+    <div id="overlay">
+        <div class="loader"></div>
+        <div id="loader-text">Checking Connection .....</div>
+    </div>
+    <div class="container">
+        <div class="main_heading one">
+            <h1>Welcome to the HubSpot App</h1>
+        </div>
+
+        <form id="hubspot-form" action="/process_selection" method="post">
+            <div class="table-heading">
+                <h2 class="hub-text">HubSpot Accounts</h2>
+                <h2 class="table-text">Choose HubSpot Accounts from the List</h2>
+                <p>Select only one account if available, or click the <a href="{{ authorization_url }}">Connect with HubSpot</a> if no account is found.</p>
+            </div>
+
+            {% if user_data %}
+            <table class="rwd-table">
+                <tr>
+                    <th>Hub ID</th>
+                    <th>User</th>
+                    <th>Refresh Token</th>
+                    <th>Connection</th>
+                </tr>
+                {% for row in user_data %}
+                <tr>
+                    <td >{{ row.hub_id }}</td>
+                    <td>{{ row.user }}</td>
+                    <td>{{ row.refresh_token }}</td>
+                    <td>
+                    <button type="submit" name="fetch_now" value="{{ row.hub_id }}" class="btn btn-primary">Checking Connection</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <br>
+
+            {% else %}
+            <p>No stored data available.</p>
+            {% endif %}
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script>
+          document.querySelector('form').addEventListener('submit', function() {
+          document.getElementById('overlay').style.visibility = 'visible';
+          document.getElementById('loader-text').style.visibility = 'visible';
+        });
+      
+        window.addEventListener('load', function() {
+          document.getElementById('overlay').style.visibility = 'hidden';
+          document.getElementById('loader-text').style.visibility = 'hidden';
+        });
+    </script>
+      
+        <script>
+        window.addEventListener('unload', function(event) {
+            navigator.sendBeacon('/terminate');
+        });
+    </script>
+</body>
+</html>
